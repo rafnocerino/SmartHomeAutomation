@@ -1,0 +1,13 @@
+-la cartella WSN contiene l'implementazione della WSN e deve essere copiata in contiki-ng/examples/
+
+-la cartella Cloud Application contiene il codice sorgente e il jar della cloud application
+
+-la cartella Client_project contiene il codice sorgente e il jar del client
+
+**Qualora ci fossero problemi nell'esecuzione delle 2 applicazioni java, potrebbe essere utile sapere che il workspace di eclipse
+  in cui sono state sviluppate le 2 applicazioni si chiama "test"
+
+**Nella cartella della WSN potete trovare anche una simulaziona già preimpostata della rete con 3 sensori di temperatura + attutaore
+  e 3 sensori di luminosità + attuatore
+
+Grazie Mille per l'attenzione.
