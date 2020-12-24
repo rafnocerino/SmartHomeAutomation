@@ -3,7 +3,7 @@
 <p> The project was developed as an assignment of the IoT course of the MSc in Computer Engineering (@ Univeristy of Pisa). 
   The main purpose of the project was to develop a WSN used with a Cloud Application in order to provide SmartHome Automation.
   
-  Since during the assignment period there was the SARS-CoV2 pandemic, we didn't have the possibility to use real Hardware(sensors and actuators) to deploy the network. In order to test the code of sensors/actuators and their interacton with the Cloud/Client applications, we used Cooja to simulate our WSN.</p>
+  Since during the assignment period there was the SARS-CoV2 pandemic, we didn't had the possibility to use real Hardware(sensors and actuators) to deploy the network. In order to test the code of sensors/actuators and their interacton with the Cloud/Client applications, we used Cooja to simulate our WSN.</p>
 
 ## Description of the system
 <p>Our proposal was to build a WSN that allowed us to remotely control the Air Conditioning system and smart light system installed in our house.
