@@ -1,0 +1,194 @@
+
+	private Socket sockToClient;
+	private final int portToClient=7100;
+	private DataOutputStream dosToClient;
+
+	private ArrayList<Double> temp;
+	private int countUploadTemp;
+
+	private List<CoapClient> client_temp;
+	private static List<CoapObserveRelation> relation_temp;
+
+	private List<CoapClient> actuator_temp;
+
+
+
+
+/*private void createDataConnectionClient() {
+
+		try {
+			sockToClient = new Socket(ipClient,portToClient);
+			dosToClient = new DataOutputStream(sockToClient.getOutputStream());
+			System.out.println("Created a new connection to the client in order to send it the data! \n");
+
+		}catch(IOException io) {
+			io.printStackTrace();
+		}
+
+	}*/
+
+	/*private void prepareTempRequest(String room,String res) {
+
+		ArrayList<IoTNode> sens = new ArrayList<>(Cloud_Application_Main.sensor_list);
+		ArrayList<Integer> index = new ArrayList<Integer>();
+		for(int i=0;i<sens.size();i++) {
+			if(sens.get(i).getRoom().equals(room) && sens.get(i).getResource_name().equals(res)) {
+				index.add(i);
+			}
+		}
+		Collections.sort(index);
+		for(int i=0;i<index.size();i++) {
+			client_temp.add(new CoapClient("coap://["+sens.get(index.get(i)).getIP_addr()+"]/"+sens.get(index.get(i)).getResource_name()));
+		}
+		for(int i=0;i<client_temp.size();i++) {
+			temp.add(0.0);
+		}
+	}
+
+	private void ActivateAutonomousTemp(final String room, final int temperature) {
+
+		for(int i=0;i<client_temp.size();i++) {
+
+			relation_temp.add(client_temp.get(i).observe(new CoapHandler() {
+
+				@Override public void onLoad(CoapResponse response) {
+
+					String content = response.getResponseText();
+					String node_address = response.advanced().getSource().getHostAddress();
+					String last = String.valueOf(node_address.charAt((node_address.length())-1));
+					int idTempSensor = Integer.parseInt(last);
+					idTempSensor=(idTempSensor%client_temp.size());
+
+					String[] splitted = content.split(";");
+					double value = Double.parseDouble(splitted[1]);
+					countUploadTemp=(countUploadTemp+1)%(client_temp.size()+1);
+					temp.remove(idTempSensor);
+					temp.add(idTempSensor,value);
+					double avg=0;
+					if(countUploadTemp == client_temp.size()) {
+						double sum=0;
+						for(int i=0;i<temp.size();i++) {
+							sum+=temp.get(i);
+						}
+						avg=sum/temp.size();
+						if(avg > 25.0) {
+							
+							////setAirCond(room,"temp",temperature,"on");
+							Thread t = new POSTonlyThread(room,"temp_act",temperature,"on");
+							t.start();
+							content=room+";ALERT;"+content+";"+idTempSensor;
+							
+						}else {
+							
+							content=room+";"+"VALUE"+";"+content+";"+idTempSensor;
+						}
+					}else {
+						content=room+";"+"VALUE"+";"+content+";"+idTempSensor;
+					}
+					System.out.println(content+";"+avg);
+					synchronized(sockToClient) {
+						
+						if(sockToClient!=null && !sockToClient.isClosed()) {					
+							try {
+								dosToClient.writeUTF(content);
+								sockToClient.notifyAll();
+	
+							}catch(SocketException io) {
+								
+								System.out.println("Client staccato e socket chiuso!");
+								try{sockToClient.close();}catch(IOException i){i.printStackTrace();};
+								sockToClient.notifyAll();
+								
+	
+							}catch(IOException io) {
+								io.printStackTrace();
+							}
+							
+						}
+	
+					}
+
+				}
+
+				@Override public void onError() {
+					System.err.println("-Failed--------");
+				}
+			}));
+			
+			
+		}
+
+
+	}
+
+	private void closeUpdateTemp() {
+		
+		
+		for(int i=0;i<relation_temp.size();i++) {
+			
+			relation_temp.get(i).proactiveCancel();
+			
+		}
+
+	}
+
+	private void setAirCond(String room, String res,int temp,String mode) {
+		
+		System.out.println(room+res+temp+mode);
+		actuator_temp.clear();
+		List<IoTNode> act = new ArrayList<>(Cloud_Application_Main.actuator_list);
+
+		ArrayList<Integer> index = new ArrayList<Integer>();
+		List<CoapClient>dst_list=new ArrayList<>();
+		for(int i=0;i<act.size();i++) {
+			if(act.get(i).getRoom().equals(room) && act.get(i).getResource_name().contentEquals(res)) {
+				index.add(i);
+			}
+		}
+
+		Collections.sort(index);
+		//we generally expect only one actuator, but it's not a general rule => for this reason we use the for cycle
+		for(int i=0;i<index.size();i++) {
+			dst_list.add(new CoapClient("coap://["+act.get(index.get(i)).getIP_addr()+"]/"+act.get(index.get(i)).getResource_name()));
+		}
+
+		System.out.println("metà aria cond \n");
+
+
+		for(int i=0;i<dst_list.size();i++) {
+
+			Request req = new Request(Code.POST);
+			req.getOptions().addUriQuery("temp="+temp);
+			req.setPayload("mode="+mode);
+			CoapResponse resp = dst_list.get(i).advanced(req);
+
+		}
+		//using this code we will send POST request also to all the temperature sensor installed inside
+		//the specified room in order to implement data consistency. In this way the sensors will be able
+		//to generate in a coherent way the temperatures
+
+		List<IoTNode> sens = new ArrayList<>(Cloud_Application_Main.sensor_list);
+		List<CoapClient> coherence_sens = new ArrayList<>();
+		index.clear();
+		for(int i=0;i<sens.size();i++) {
+			if(sens.get(i).getRoom().equals(room) && sens.get(i).getResource_name().equals("temp")) {
+				index.add(i);
+			}
+		}
+		Collections.sort(index);
+		for(int i=0;i<index.size();i++) {
+			coherence_sens.add(new CoapClient("coap://["+sens.get(index.get(i)).getIP_addr()+"]/"+sens.get(index.get(i)).getResource_name()));
+		}	
+		
+		for(int i=0;i<coherence_sens.size();i++) {
+
+			Request req1 = new Request(Code.POST);
+			req1.getOptions().addUriQuery("temp="+temp);
+			req1.setPayload("mode="+mode);
+			CoapResponse resp = coherence_sens.get(i).advanced(req1);
+		}
+		
+		System.out.println("fine aria cond \n");
+
+
+	}*/
