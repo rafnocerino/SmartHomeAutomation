@@ -11,9 +11,9 @@
  
 Our project is composed by three main elements:
 <ul>
-  <li> WSN: Wireless sensors networks composed by some sensors and actuators useful to collect data needed by the applications.</li>
+  <li> WSN: Wireless sensors network composed by some sensors and actuators useful to collect data needed by the applications.</li>
   <li> Cloud Application: Always on application which receives periodically data from sensors and performs all the important computations.</li>
-  <li> Client application: Application used by the user in order to see updates and info about his home and used to request operation on AirCond/Smart ligth system.</li>
+  <li> Client application: Application used by the user in order to see updates and info about his home and used to request operation on AirCond/Smart ligth systems.</li>
 </ul>
 
 ### How the application works?
@@ -37,7 +37,7 @@ Our project is composed by three main elements:
   <li>ObserveTemperature: to see all the sensed temperature information of a room of the current day (from the newest to the oldest).</li>
   <li>AirCondON/OFF: to set the AirCond ON/OFF specifying also the desired temperature(if ON).</li>
   <li>AutomaticTempControlON/OFF: to enable/disable the automatic temperature control. If the temperature in the room exceeds a threshold (specifyed by the user) the Smart system will activate the AirCond until the deired temp is reached.<li>
-  <li>ProgramAirCondON/OFF: to enable/disable the programmed activation of the AirConditioner on a particular hour of the day and with a specifyed temperature.</li>
+  <li>ProgramAirCondON/OFF: to enable/disable the programmed activation of the AirConditioner on a particular hour of the day and with a specified temperature.</li>
 </ul>
 
 <p> What can be done on the Smart Ligth system?</p>
